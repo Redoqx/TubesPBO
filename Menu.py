@@ -96,13 +96,13 @@ class Ui_Menu(object):
         print(self.username)
 
         #Pinjam
-        self.Pinjam.clicked.connect(lambda: self.GotoPinjam(Menu))
+        self.Pinjam.pressed.connect(lambda: self.GotoPinjam(Menu))
 
         #Balikin
-        self.BalikinBarang.clicked.connect(lambda: self.GotoBalikin(Menu))
+        self.BalikinBarang.pressed.connect(lambda: self.GotoBalikin(Menu))
 
         #Lihat
-        self.Lihat.clicked.connect(lambda: self.GotoLihat(Menu))
+        self.Lihat.pressed.connect(lambda: self.GotoLihat(Menu))
 
 
         self.retranslateUi(Menu)

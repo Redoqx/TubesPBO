@@ -9,6 +9,7 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtWidgets import QMessageBox
 import mysql.connector
 
 
@@ -170,7 +171,7 @@ class Ui_Balikin(object):
         QtCore.QMetaObject.connectSlotsByName(Balikin)
 
         #code here
-        self.Input.clicked.connect(self.Inputin)
+        self.Input.pressed.connect(self.Inputin)
 
     def retranslateUi(self, Balikin):
         _translate = QtCore.QCoreApplication.translate
@@ -209,11 +210,72 @@ class Ui_Balikin(object):
     def Inputin(self):
         print("Bakal Nerima Data")
         #terima data
-        self.No_Surat.text()
-        self.NIP.text()
-        self.ID_Barang.text()
-        self.Pilih_Gedung.currentText()
-        self.No_Ruangan.text()
+        no_surek = self.No_Surat.text()
+        ID_Barang = self.ID_Barang.text()
+        Gedung = self.Pilih_Gedung.currentText()
+        Biliak = self.No_Ruangan.text()
+
+        if not (no_surek and ID_Barang and Gedung and Biliak) or Gedung == '- Pilih Gedung -':
+            self.show_Popup("Harap Isi Semua Kelengkapan Data")
+        elif (Gedung != Biliak[0]):
+            self.show_Popup("Harap Pastikan ulang Data Yang Anda Masukkan Telah Benar!")
+        else:
+            masuk=1
+
+            ########################################
+            #Mengembalikan Nilai Jumlah barang
+            try:
+                cek = f"select Jumlah_Barang from peminjaman where ID_Peminjaman = '{no_surek}'"
+                mycursor.execute(cek)
+                jml_pinjam = mycursor.fetchall()
+                jml_pinjam = (jml_pinjam[0])[0]
+                jml_pinjam = int(jml_pinjam)
+
+                cek = f"select stok_tersedia from barang where ID_Barang = '{ID_Barang}'"
+                mycursor.execute(cek)
+                jml_sekarang = mycursor.fetchall()
+                jml_sekarang = (jml_sekarang[0])[0]
+                jml_sekarang = int(jml_sekarang)
+
+                jml_sekarang = jml_sekarang + jml_pinjam
+
+                Update_barang=f"Update barang set stok_tersedia = '{jml_sekarang}' where barang.ID_Barang = '{ID_Barang}'"
+                mycursor.execute(Update_barang)
+                mydb.commit()
+
+            except mysql.connector.Error as error:
+                self.show_Popup("Gagal mengembalikan barang, harap periksa kembali data inputan anda")
+                masuk = 0
+
+            ########################################
+            #Menghapus Peminjaman
+            try:
+                perintah = f"DELETE FROM peminjaman WHERE peminjaman.ID_Peminjaman = '{no_surek}'"
+                mycursor.execute(perintah)
+                mydb.commit()
+            except mysql.connector.Error as error:
+                self.show_Popup("Gagal mengembalikan barang, harap periksa kembali data inputan anda")
+                masuk =0
+
+            # #Memasukkan data
+            # try:
+            #     sql_insert_blob_query = """ INSERT INTO peminjaman
+            #                   (ID_Peminjaman, ID_Peminjam, ID_Barang, Jumlah_Barang, Tgl_Peminjaman, Tgl_Pengembalian, Gedung, No_Ruangan, BAST_Disposisi) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)"""
+            #     datanya = (no_surek,self.ID,ID_Barang,Banyak,Bilo_Pinjam,Bilo_Baliak,Gedung,Biliak,Gambar)
+            #     result = mycursor.execute(sql_insert_blob_query,datanya)
+            #     mydb.commit()
+            # except mysql.connector.Error as error:
+            #     self.show_Popup(f'Gagal Mengunggah Data Peminjaman\nError Code\n{error}')
+            #     masuk = 0
+
+            if masuk:
+                self.show_Popup("Berhasil Mengunggah Data Peminjaman")
+
+    def show_Popup(self,message):
+        msg = QMessageBox()
+        msg.setWindowTitle("Login info")
+        msg.setText(message)
+        x = msg.exec_()
 
 
 

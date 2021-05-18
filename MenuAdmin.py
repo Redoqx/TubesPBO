@@ -99,11 +99,11 @@ class Ui_MenuAdmin(object):
         #code here
         print(self.username)
         #Lihat
-        self.Lihat.clicked.connect(self.lihatingedung)
+        self.Lihat.pressed.connect(self.lihatingedung)
         #perolehan
-        self.PerolehanBarang.clicked.connect(lambda: self.gotoPerolehan(MenuAdmin))
+        self.PerolehanBarang.pressed.connect(lambda: self.gotoPerolehan(MenuAdmin))
         #ExpertMode
-        self.Expert.clicked.connect(self.gotoExpert)
+        self.Expert.pressed.connect(self.gotoExpert)
 
         self.retranslateUi(MenuAdmin)
         QtCore.QMetaObject.connectSlotsByName(MenuAdmin)

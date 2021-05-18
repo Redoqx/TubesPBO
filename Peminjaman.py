@@ -234,9 +234,9 @@ class Ui_Minjam(object):
         #code here
         print(self.username)
         #Dapetin alamat
-        self.DirectoryFinderButton.clicked.connect(self.CariinDung)
+        self.DirectoryFinderButton.pressed.connect(self.CariinDung)
         #Nginput
-        self.Input.clicked.connect(self.Inputin)
+        self.Input.pressed.connect(self.Inputin)
 
     def retranslateUi(self, Minjam):
         _translate = QtCore.QCoreApplication.translate
