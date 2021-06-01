@@ -164,7 +164,7 @@ class Ui_InventarisGedung(object):
                     self.x.add_row(j)
                 self.x = str(self.x)
                 self.x = f'Daftar Inventaris Gedung {Gedung}:\n'+self.x
-                
+
                 self.Tampilkan(InventarisGedung)
         except mysql.connector.Error as error:
             self.show_Popup(f'Gagal Mengunggah Data Peminjaman\nError Code\n{error}')

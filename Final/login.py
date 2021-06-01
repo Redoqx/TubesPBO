@@ -1,9 +1,7 @@
-import Menu
-import MenuAdmin
+import AdminMenu,MenuUser
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QMessageBox
 import mysql.connector
-
 
 mydb = mysql.connector.connect(
   host="localhost",
@@ -19,7 +17,6 @@ class Ui_LoginWindow(object):
         LoginWindow.setStyleSheet("background-color: rgb(255, 235, 235);")
         self.centralwidget = QtWidgets.QWidget(LoginWindow)
         self.centralwidget.setObjectName("centralwidget")
-
         self.Login_view = QtWidgets.QGroupBox(self.centralwidget)
         self.Login_view.setGeometry(QtCore.QRect(110, 110, 571, 381))
         self.Login_view.setAutoFillBackground(False)
@@ -42,9 +39,9 @@ class Ui_LoginWindow(object):
         self.Password = QtWidgets.QLineEdit(self.Login_view)
         self.Password.setGeometry(QtCore.QRect(130, 230, 311, 41))
         self.Password.setStyleSheet("background:transparent;\n"
-        "color: rgb(0, 0, 0);\n"
-        "border:none;\n"
-        "border-bottom:1px solid;")
+"color: rgb(0, 0, 0);\n"
+"border:none;\n"
+"border-bottom:1px solid;")
         self.Password.setText("")
         self.Password.setEchoMode(QtWidgets.QLineEdit.Password)
         self.Password.setClearButtonEnabled(False)
@@ -54,7 +51,7 @@ class Ui_LoginWindow(object):
         self.Login_button.setGeometry(QtCore.QRect(330, 320, 111, 41))
         self.Login_button.setAutoFillBackground(False)
         self.Login_button.setStyleSheet("color: rgb(0, 0, 0);\n"
-"background-color: rgb(255, 255, 255);")
+"background-color: rgb(170, 255, 255);")
         self.Login_button.setDefault(True)
         self.Login_button.setObjectName("Login_button")
 
@@ -65,17 +62,15 @@ class Ui_LoginWindow(object):
         self.userIcon.setScaledContents(True)
         self.userIcon.setObjectName("userIcon")
         LoginWindow.setCentralWidget(self.centralwidget)
-
         self.statusbar = QtWidgets.QStatusBar(LoginWindow)
         self.statusbar.setObjectName("statusbar")
         LoginWindow.setStatusBar(self.statusbar)
 
-        #code here
-        #login button pressed
-        self.Login_button.pressed.connect(self.loginkan)
-
         self.retranslateUi(LoginWindow)
         QtCore.QMetaObject.connectSlotsByName(LoginWindow)
+
+        #code here
+        self.Login_button.pressed.connect(lambda: self.Loginkan(LoginWindow))
 
     def retranslateUi(self, LoginWindow):
         _translate = QtCore.QCoreApplication.translate
@@ -84,66 +79,60 @@ class Ui_LoginWindow(object):
         self.Username.setPlaceholderText(_translate("LoginWindow", "Username"))
         self.Login_button.setText(_translate("LoginWindow", "Login"))
 
-    def loginkan(self):
-        self.username = self.Username.text()
-        if not (self.username):
+    def Loginkan(self,LoginWindow):
+        UN = self.Username.text()
+        PS = self.Password.text()
+        if not(UN and PS):
             self.show_Popup("Username dan Password tidak boleh kosong!")
             return 0
-        mycursor.execute("Select password from login_info where username  = '" + self.username + "\'")
-        result = mycursor.fetchall()
-        #kalau username tidak ada
-        if not result:
-            self.show_Popup("Username atau Password anda salah!")
-            return 0
-        #get the password
-        result = (result[0])[0]
-        print(type(result))
-        print(result)
-        if result == self.Password.text():
-            self.show_Popup("Anda Berhasil Login!")
-            mycursor.execute("Select Account_role from login_info where username  = '" + self.username + "\'")
+        try:
+            mycursor.execute(f"Select password from login_info where username = '{UN}'")
             result = mycursor.fetchall()
+
+            if not result:
+                self.show_Popup("Username atau Password Anda salah!")
+                return 0
             result = (result[0])[0]
-            if result == 'admin':
-                #admin
-                print("Dia Admin")
-                self.gotoMenuAdmin(LoginWindow)
-            else:
-                #user biasa
-                self.gotoMenu(LoginWindow)
-        else:
-            self.show_Popup("Username atau Password anda salah!")
+
+            if result == PS:
+                self.show_Popup("Anda Berhasil Login!")
+                mycursor.execute(f"select account_role from login_info where username = '{UN}'")
+                result = mycursor.fetchall()
+                result = result[0][0]
+
+                if result == 'admin':
+                    self.gotoMenuAdmin(LoginWindow)
+                elif result == 'tamu':
+                    self.gotoMenuUser(LoginWindow)
+
+        except mysql.connector.Error as error:
+            self.show_Popup(f'Galat!\nError Code\n{error}')
 
     def gotoMenuAdmin(self,LoginWindow):
         self.Menu = QtWidgets.QMainWindow()
-        self.ui = MenuAdmin.Ui_MenuAdmin()
-        self.ui.getMeAName(self.username)
+        self.ui = AdminMenu.Ui_AdminMenu()
         self.ui.setupUi(self.Menu)
         self.Menu.show()
         LoginWindow.hide()
-        self.ui.BackButton.clicked.connect(lambda: self.Muncullah(Menu))
+        self.ui.LogOutButton.clicked.connect(lambda: self.RiseMeUp(LoginWindow))
 
-
-    def gotoMenu(self,LoginWindow):
+    def gotoMenuUser(self,LoginWindow):
         self.Menu = QtWidgets.QMainWindow()
-        self.ui = Menu.Ui_Menu()
-        self.ui.getMeAName(self.username)
+        self.ui = MenuUser.Ui_Menu()
         self.ui.setupUi(self.Menu)
         self.Menu.show()
         LoginWindow.hide()
-        self.ui.BackButton.clicked.connect(lambda: self.Muncullah(Menu))
+        self.ui.LogOutButton.clicked.connect(lambda: self.RiseMeUp(LoginWindow))
 
-    def Muncullah(self,Menu):
-        self.Menu.hide()
+    def RiseMeUp(self,LoginWindow):
         LoginWindow.show()
+        self.Menu.hide()
 
     def show_Popup(self,message):
         msg = QMessageBox()
         msg.setWindowTitle("Login info")
         msg.setText(message)
         x = msg.exec_()
-
-
 
 if __name__ == "__main__":
     import sys
