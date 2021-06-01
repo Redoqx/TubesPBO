@@ -9,6 +9,15 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtWidgets import QMessageBox
+import mysql.connector
+
+mydb = mysql.connector.connect(
+  host="localhost",
+  user="root",
+  database ="tubes_pbo"
+)
+mycursor = mydb.cursor()
 
 
 class Ui_Tampilkan(object):
@@ -164,6 +173,55 @@ class Ui_Tampilkan(object):
         self.tableWidget.setSortingEnabled(__sortingEnabled)
         self.Judul.setText(_translate("Tampilkan", "DATA INVENTARIS ......"))
 
+    def setUpin(self,Judul,Loc):
+        self.Judul.setText(f"DATA INVENTARIS {Judul}")
+        self.Loc = Loc
+
+        if Judul == "GEDUNG":
+            order = f"""select ID_Peminjaman,ID_Peminjam,ID_Barang,Gedung,No_Ruangan
+                    from gedung right outer join peminjaman on peminjaman.gedung = gedung.Kode_Gedung
+                    where Nama_Gedung = '{Loc}'"""
+        if Judul == "RUANG":
+            order = f"""select ID_Peminjaman,ID_Peminjam,ID_Barang,Gedung,peminjaman.No_Ruangan
+                    from ruangan right outer join peminjaman on peminjaman.No_Ruangan = ruangan.No_Ruangan
+                    where ruangan.No_Ruangan = '{Loc}'"""
+        try:
+            mycursor.execute(order)
+            data = mycursor.fetchall()
+            if not data:
+                self.tableWidget.setColumnCount(1)
+                self.tableWidget.setRowCount(1)
+                item = QtWidgets.QTableWidgetItem()
+                self.tableWidget.setVerticalHeaderItem(0, item)
+                item = QtWidgets.QTableWidgetItem()
+                self.tableWidget.setHorizontalHeaderItem(0, item)
+                item = QtWidgets.QTableWidgetItem()
+                self.tableWidget.setItem(0, 0, item)
+                item = self.tableWidget.item(0, 0)
+                item.setText("NULL")
+                self.show_Popup("Tidak terdapat data inventaris apapun di lokasi ini!")
+            else:
+                self.tableWidget.setRowCount(len(data))
+                ci=0
+                for i in data:
+                    cj=0
+                    for j in i:
+                        item = QtWidgets.QTableWidgetItem()
+                        self.tableWidget.setItem(ci, cj, item)
+                        item = self.tableWidget.item(ci,cj)
+                        item.setText(j)
+                        cj+=1
+                    ci+=1
+
+        except mysql.connector.Error as error:
+            self.show_Popup(f'Galat!\nError Code\n{error}')
+
+    def show_Popup(self,message):
+        msg = QMessageBox()
+        msg.setWindowTitle("Login info")
+        msg.setText(message)
+        x = msg.exec_()
+
 
 if __name__ == "__main__":
     import sys
@@ -171,6 +229,6 @@ if __name__ == "__main__":
     Tampilkan = QtWidgets.QMainWindow()
     ui = Ui_Tampilkan()
     ui.setupUi(Tampilkan)
-    ui.setUpin("TEST","C 203")
+    ui.setUpin("GEDUNG","Gedung D")
     Tampilkan.show()
     sys.exit(app.exec_())

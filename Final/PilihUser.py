@@ -10,12 +10,12 @@ mydb = mysql.connector.connect(
 mycursor = mydb.cursor()
 
 
-class Ui_PilihLokasi(object):
-    def setupUi(self, PilihLokasi):
-        PilihLokasi.setObjectName("PilihLokasi")
-        PilihLokasi.resize(640, 331)
-        PilihLokasi.setStyleSheet("background-color: rgb(255, 235, 235);")
-        self.centralwidget = QtWidgets.QWidget(PilihLokasi)
+class Ui_PilihUsername(object):
+    def setupUi(self, PilihUsername):
+        PilihUsername.setObjectName("PilihUsername")
+        PilihUsername.resize(639, 330)
+        PilihUsername.setStyleSheet("background-color: rgb(240, 240, 240);")
+        self.centralwidget = QtWidgets.QWidget(PilihUsername)
         self.centralwidget.setObjectName("centralwidget")
         self.frame = QtWidgets.QFrame(self.centralwidget)
         self.frame.setGeometry(QtCore.QRect(20, 20, 601, 291))
@@ -24,7 +24,7 @@ class Ui_PilihLokasi(object):
         self.frame.setFrameShadow(QtWidgets.QFrame.Raised)
         self.frame.setObjectName("frame")
         self.label_2 = QtWidgets.QLabel(self.frame)
-        self.label_2.setGeometry(QtCore.QRect(30, 26, 291, 20))
+        self.label_2.setGeometry(QtCore.QRect(30, 26, 301, 20))
         font = QtGui.QFont()
         font.setFamily("Calibri")
         font.setPointSize(12)
@@ -51,7 +51,7 @@ class Ui_PilihLokasi(object):
         self.comboBox.setObjectName("comboBox")
         self.comboBox.addItem("")
         self.Ruang = QtWidgets.QPushButton(self.frame_2)
-        self.Ruang.setGeometry(QtCore.QRect(290, 120, 191, 51))
+        self.Ruang.setGeometry(QtCore.QRect(350, 120, 131, 51))
         font = QtGui.QFont()
         font.setPointSize(9)
         font.setBold(True)
@@ -61,25 +61,23 @@ class Ui_PilihLokasi(object):
 "background-color: rgb(170, 255, 255);\n"
 "border-radius : 10px;")
         self.Ruang.setObjectName("Ruang")
-        PilihLokasi.setCentralWidget(self.centralwidget)
+        PilihUsername.setCentralWidget(self.centralwidget)
 
-        self.retranslateUi(PilihLokasi)
-        QtCore.QMetaObject.connectSlotsByName(PilihLokasi)
+        self.retranslateUi(PilihUsername)
+        QtCore.QMetaObject.connectSlotsByName(PilihUsername)
+
+        #code here
 
 
-    def retranslateUi(self, PilihLokasi):
+    def retranslateUi(self, PilihUsername):
         _translate = QtCore.QCoreApplication.translate
-        PilihLokasi.setWindowTitle(_translate("PilihLokasi", "Pilih Lokasi"))
-        self.label_2.setText(_translate("PilihLokasi", "Temukan data dari:"))
-        self.comboBox.setItemText(0, _translate("PilihLokasi", "-Pilih Lokasi-"))
-        self.Ruang.setText(_translate("PilihLokasi", "Lihat Data Inventaris"))
+        PilihUsername.setWindowTitle(_translate("PilihUsername", "Pilih Username"))
+        self.label_2.setText(_translate("PilihUsername", "Pilih Username yang akan dihapus:"))
+        self.comboBox.setItemText(0, _translate("PilihUsername", "-Pilih Username-"))
+        self.Ruang.setText(_translate("PilihUsername", "Hapus Akun"))
 
-    def setUpin(self, Jenis):
-        # self.comboBox.addItem("")
-        if Jenis == 1:
-            order = "select Nama_Gedung from gedung"
-        elif Jenis == 2:
-            order = "select No_Ruangan from ruangan"
+    def setUpin(self):
+        order = "select username from login_info"
         try:
             mycursor.execute(order)
             result = mycursor.fetchall()
@@ -94,12 +92,13 @@ class Ui_PilihLokasi(object):
         msg.setText(message)
         x = msg.exec_()
 
+
 if __name__ == "__main__":
     import sys
     app = QtWidgets.QApplication(sys.argv)
-    PilihLokasi = QtWidgets.QMainWindow()
-    ui = Ui_PilihLokasi()
-    ui.setupUi(PilihLokasi)
-    ui.setUpin(1)
-    PilihLokasi.show()
+    PilihUsername = QtWidgets.QMainWindow()
+    ui = Ui_PilihUsername()
+    ui.setupUi(PilihUsername)
+    ui.setUpin()
+    PilihUsername.show()
     sys.exit(app.exec_())
